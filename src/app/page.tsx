@@ -1,36 +1,35 @@
 import Link from 'next/link';
-import { apiGet } from '@/lib/api';
-import type { CatalogResponse } from '@/types';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-export default async function HomePage() {
-  const data = await apiGet<CatalogResponse>('/catalog?page=1&pageSize=20', { cache: 'no-store' });
+export default async function Landing() {
+  const cookieStore = await cookies();
+  const access = cookieStore.get('access_token')?.value;
+
+  if (access) redirect('/browse/genre/83');
 
   return (
-    <main style={{ padding: 24 }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Netflix MVP</h1>
-        <Link href="/login">Login</Link>
-      </header>
+    <main style={{ padding: 32, maxWidth: 760, margin: '0 auto' }}>
+      <h1 style={{ fontSize: 44, marginBottom: 8 }}>
+        Unlimited movies, TV shows, and more.
+      </h1>
+      <p style={{ opacity: 0.8 }}>
+        Ready to watch? Enter your email to create or restart your membership.
+      </p>
 
-      <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 16 }}>
-        {data.items.map((t) => (
-          <Link key={t.id} href={`/title/${t.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ border: '1px solid #ddd', borderRadius: 12, overflow: 'hidden' }}>
-              {t.posterUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={t.posterUrl} alt={t.name} style={{ width: '100%', height: 260, objectFit: 'cover' }} />
-              ) : (
-                <div style={{ width: '100%', height: 260, background: '#eee' }} />
-              )}
-              <div style={{ padding: 12 }}>
-                <div style={{ fontWeight: 600 }}>{t.name}</div>
-                <div style={{ opacity: 0.7, fontSize: 12 }}>
-                  {t.type} · {t.year ?? '—'}
-                </div>
-              </div>
-            </div>
-          </Link>
-        ))}
+      <form action="/signup" method="get" style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+        <input
+          name="email"
+          placeholder="Email address"
+          style={{ flex: 1, padding: 12, borderRadius: 10, border: '1px solid #ddd' }}
+        />
+        <button style={{ padding: '12px 18px', borderRadius: 10 }}>
+          Get Started
+        </button>
+      </form>
+
+      <div style={{ marginTop: 18 }}>
+        <Link href="/login">Sign In</Link>
       </div>
     </main>
   );

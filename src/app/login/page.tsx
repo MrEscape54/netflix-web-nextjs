@@ -21,7 +21,7 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
       if (!r.ok) throw new Error(await r.text());
-      router.push('/');
+      router.push('/browse/genre/83'); // Shows como default
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Login error');
     } finally {
